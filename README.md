@@ -3,7 +3,7 @@
 One to-do list for you and your AI coding agents, always in view on your Windows desktop.
 Your agents write the items. You see them on a spiral notepad and tick them off.
 
-![The TodoPad note on the desktop](docs/screenshot.png)
+![The AgentsToDo note on the desktop](docs/screenshot.png)
 
 > **Built with AI.** This app was written by [Claude Code](https://claude.com/claude-code), Anthropic's AI coding assistant,
 > and directed and tested by a person. It is shared as-is, in case it is useful to someone else.
@@ -18,7 +18,7 @@ AgentsToDo keeps all of these in one list that stays on your screen.
 
 ## How it works
 
-- **The list is one Markdown file**, `todo.md` in your user folder. The desktop note (the app is called TodoPad) shows it.
+- **The list is one Markdown file**, `todo.md` in your user folder. The desktop note shows it.
 - **Agents add the items.** When an agent finds a problem it is not fixing, it adds a line under the project's heading.
 - **Your own to-dos go through the agent too.** Tell it "add a to-do: renew the domain", and it writes the line.
 - **You tick items on the note.** A tick writes `[x]` into the file, so the agents see what is done.
@@ -57,6 +57,7 @@ Put the same lines in the file they read their instructions from, for example `A
 - Shows the `- [ ]` items of the file, grouped by its `##` headings.
 - Reloads as soon as the file changes on disk.
 - Ticking a box writes `[x]` into that one line. The rest of the file stays exactly as it was.
+- Double-click a line to select its text. All of it starts selected, so `Ctrl+C` copies the whole item, even the part cut off with "…". Press `Esc` or click elsewhere to finish.
 - Drag it anywhere. It opens where you left it.
 - Resize it with the ridges in the bottom-right corner. It keeps that size too.
 - Three buttons: keep it in front of other windows or behind them, minimize, and close.
@@ -87,7 +88,7 @@ Save the file as UTF-8.
 
 ## Settings
 
-`%LOCALAPPDATA%\TodoPad\settings.json` keeps the position, size, front/behind mode and folded groups.
+`%LOCALAPPDATA%\AgentsToDo\settings.json` keeps the position, size, front/behind mode and folded groups.
 To use another file, close the note, add `TodoFile`, and start it again:
 
 ```json
@@ -102,10 +103,10 @@ Running it needs only the .NET 10 Desktop Runtime.
 ```powershell
 git clone https://github.com/CanManalp/AgentsToDo.git
 cd AgentsToDo
-dotnet publish src/TodoPad -c Release -o "$env:LOCALAPPDATA\Programs\TodoPad"
+dotnet publish src/AgentsToDo -c Release -o "$env:LOCALAPPDATA\Programs\AgentsToDo"
 ```
 
-Then start `%LOCALAPPDATA%\Programs\TodoPad\TodoPad.exe`.
+Then start `%LOCALAPPDATA%\Programs\AgentsToDo\AgentsToDo.exe`.
 To find it in the Start menu, put a shortcut to it in the Programs folder (press `Win+R` and type `shell:programs`).
 To start it with Windows, put a shortcut to it in the Startup folder (press `Win+R` and type `shell:startup`).
 To update, close the note first, then run the same `dotnet publish` command again.

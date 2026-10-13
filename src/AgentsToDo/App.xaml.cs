@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace TodoPad;
+namespace AgentsToDo;
 
 public partial class App : Application
 {
@@ -11,7 +11,7 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        singleInstance = new Mutex(true, @"Local\TodoPad.SingleInstance", out bool isFirstInstance);
+        singleInstance = new Mutex(true, @"Local\AgentsToDo.SingleInstance", out bool isFirstInstance);
         if (!isFirstInstance)
         {
             Shutdown();

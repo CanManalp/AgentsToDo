@@ -1,8 +1,8 @@
-<Window x:Class="TodoPad.MainWindow"
+<Window x:Class="AgentsToDo.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:TodoPad"
-        Title="TodoPad"
+        xmlns:local="clr-namespace:AgentsToDo"
+        Title="AgentsToDo"
         Width="340" Height="480" MinWidth="240" MinHeight="260"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ResizeMode="CanMinimize" WindowStartupLocation="Manual"
@@ -19,7 +19,8 @@
                 </Grid.ColumnDefinitions>
                 <CheckBox Style="{StaticResource InkCheck}" IsChecked="{Binding IsDone, Mode=OneWay}"
                           Click="Item_Click" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
-                <Grid Grid.Column="1" Margin="8,0,10,0">
+                <Grid Grid.Column="1" Margin="8,0,10,0" Background="Transparent"
+                      MouseLeftButtonDown="ItemText_MouseLeftButtonDown">
                     <TextBlock x:Name="Label" Text="{Binding DisplayText}" HorizontalAlignment="Left"
                                VerticalAlignment="Bottom" Margin="0,0,0,-3" TextTrimming="CharacterEllipsis"/>
                     <Rectangle x:Name="Strike" Height="1.6" HorizontalAlignment="Left" VerticalAlignment="Bottom"
@@ -29,6 +30,10 @@
                             <ScaleTransform ScaleX="0"/>
                         </Rectangle.RenderTransform>
                     </Rectangle>
+                    <!-- Shown in place of the label after a double-click, so the line can be selected and copied. -->
+                    <TextBox x:Name="Selectable" Style="{StaticResource SelectableLine}" Text="{Binding DisplayText, Mode=OneWay}"
+                             Foreground="{Binding Foreground, ElementName=Label}" Visibility="Collapsed"
+                             VerticalAlignment="Bottom" Margin="-2,0,0,-3" PreviewKeyDown="SelectableLine_PreviewKeyDown"/>
                 </Grid>
             </Grid>
             <DataTemplate.Triggers>
@@ -43,6 +48,9 @@
                         </Setter.Value>
                     </Setter>
                 </DataTrigger>
+                <Trigger SourceName="Selectable" Property="Visibility" Value="Visible">
+                    <Setter TargetName="Label" Property="Visibility" Value="Hidden"/>
+                </Trigger>
             </DataTemplate.Triggers>
         </DataTemplate>
 

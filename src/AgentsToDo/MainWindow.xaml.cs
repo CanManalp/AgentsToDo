@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -9,7 +10,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Rectangle = System.Windows.Shapes.Rectangle;
 
-namespace TodoPad;
+namespace AgentsToDo;
 
 public partial class MainWindow : Window
 {
@@ -29,6 +30,7 @@ public partial class MainWindow : Window
     readonly DispatcherTimer reloadTimer = new() { Interval = TimeSpan.FromMilliseconds(200) };
     readonly FileSystemWatcher? watcher;
     int readFailures;
+    TextBox? selectedLine;
 
     public MainWindow()
     {
@@ -64,8 +66,15 @@ public partial class MainWindow : Window
         };
         Deactivated += (_, _) =>
         {
+            EndSelecting();
             if (!settings.InFront)
                 SendToBack();
+        };
+        // A click anywhere outside the selected line ends the selection.
+        PreviewMouseLeftButtonDown += (_, _) =>
+        {
+            if (selectedLine is { IsMouseOver: false })
+                EndSelecting();
         };
         Closing += (_, _) => SaveBounds();
         Closed += (_, _) => watcher?.Dispose();
@@ -155,6 +164,46 @@ public partial class MainWindow : Window
         {
             SaveDone(item, done);
         }
+    }
+
+    // Double-click a line to select it. All of it starts selected, so Ctrl+C copies the whole item,
+    // including the part cut off with "…".
+    void ItemText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount != 2 || sender is not Grid cell
+            || cell.Children.OfType<TextBox>().FirstOrDefault() is not { } line)
+            return;
+
+        e.Handled = true;
+        EndSelecting();
+        selectedLine = line;
+        line.Visibility = Visibility.Visible;
+        line.Focus();
+        // Select from the end back to the start (like Shift+Home): the caret ends at the start,
+        // so the line keeps showing its beginning instead of scrolling to its end.
+        // The box was hidden until now, and line-based selection needs it laid out first.
+        line.UpdateLayout();
+        line.CaretIndex = line.Text.Length;
+        EditingCommands.SelectToLineStart.Execute(null, line);
+    }
+
+    void SelectableLine_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Escape)
+            return;
+
+        e.Handled = true;
+        EndSelecting();
+    }
+
+    void EndSelecting()
+    {
+        if (selectedLine is null)
+            return;
+
+        selectedLine.Visibility = Visibility.Collapsed;
+        selectedLine = null;
+        Keyboard.ClearFocus();
     }
 
     void SaveDone(TodoItem item, bool done)

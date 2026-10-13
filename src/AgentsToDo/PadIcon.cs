@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace TodoPad;
+namespace AgentsToDo;
 
 /// <summary>Draws the taskbar icon: a tiny version of the notepad.</summary>
 internal static class PadIcon

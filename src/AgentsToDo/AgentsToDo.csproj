@@ -8,4 +8,9 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Draw text selection behind the text, like a highlighter, so the ink keeps its colour. -->
+    <RuntimeHostConfigurationOption Include="Switch.System.Windows.Controls.Text.UseAdornerForTextboxSelectionRendering" Value="false" />
+  </ItemGroup>
+
 </Project>

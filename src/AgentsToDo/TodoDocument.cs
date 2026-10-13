@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace TodoPad;
+namespace AgentsToDo;
 
 /// <summary>
 /// The parsed todo file. Format: an optional "# Title", "## Group" headings,

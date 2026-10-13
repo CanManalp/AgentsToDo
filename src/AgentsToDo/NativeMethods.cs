@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace TodoPad;
+namespace AgentsToDo;
 
 internal static class NativeMethods
 {

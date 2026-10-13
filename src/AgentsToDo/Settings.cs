@@ -1,13 +1,13 @@
 using System.IO;
 using System.Text.Json;
 
-namespace TodoPad;
+namespace AgentsToDo;
 
-/// <summary>Window place and view choices, kept in %LOCALAPPDATA%\TodoPad\settings.json.</summary>
+/// <summary>Window place and view choices, kept in %LOCALAPPDATA%\AgentsToDo\settings.json.</summary>
 public sealed class Settings
 {
     static readonly string FilePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TodoPad", "settings.json");
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AgentsToDo", "settings.json");
 
     static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
