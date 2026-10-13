@@ -1,0 +1,190 @@
+<Window x:Class="TodoPad.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TodoPad"
+        Title="TodoPad"
+        Width="340" Height="480" MinWidth="240" MinHeight="260"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="CanMinimize" WindowStartupLocation="Manual"
+        UseLayoutRounding="True"
+        FontFamily="{StaticResource HandFont}" FontSize="13.5"
+        Foreground="{StaticResource InkBrush}">
+    <Window.Resources>
+
+        <DataTemplate x:Key="ItemTemplate" DataType="{x:Type local:TodoItem}">
+            <Grid Height="28" Background="Transparent" ToolTip="{Binding ToolTipText}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="38"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox Style="{StaticResource InkCheck}" IsChecked="{Binding IsDone, Mode=OneWay}"
+                          Click="Item_Click" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
+                <Grid Grid.Column="1" Margin="8,0,10,0">
+                    <TextBlock x:Name="Label" Text="{Binding DisplayText}" HorizontalAlignment="Left"
+                               VerticalAlignment="Bottom" Margin="0,0,0,-3" TextTrimming="CharacterEllipsis"/>
+                    <Rectangle x:Name="Strike" Height="1.6" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                               Margin="-2,0,0,11" Width="{Binding ActualWidth, ElementName=Label}"
+                               Fill="{StaticResource InkBrush}" RenderTransformOrigin="0,0.5">
+                        <Rectangle.RenderTransform>
+                            <ScaleTransform ScaleX="0"/>
+                        </Rectangle.RenderTransform>
+                    </Rectangle>
+                </Grid>
+            </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsImportant}" Value="True">
+                    <Setter TargetName="Label" Property="Foreground" Value="{StaticResource RedInkBrush}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsDone}" Value="True">
+                    <Setter TargetName="Label" Property="Foreground" Value="{StaticResource PencilBrush}"/>
+                    <Setter TargetName="Strike" Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1"/>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <DataTemplate x:Key="GroupTemplate" DataType="{x:Type local:TodoGroup}">
+            <StackPanel>
+                <Button x:Name="Heading" Style="{StaticResource HeadingButton}" Click="Group_Click" Height="28">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="38"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Path x:Name="Chevron" Data="M0,0 L9,0 L4.5,6 Z" Fill="{StaticResource InkBrush}"
+                              HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,9"
+                              RenderTransformOrigin="0.5,0.5"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,10,0" VerticalAlignment="Bottom">
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="0,0,0,-3"/>
+                            <TextBlock Text="{Binding CountText}" Foreground="{StaticResource PencilBrush}" Margin="10,0,0,-3"/>
+                        </StackPanel>
+                    </Grid>
+                </Button>
+                <ItemsControl x:Name="Items" ItemsSource="{Binding Items}" ItemTemplate="{StaticResource ItemTemplate}"
+                              Focusable="False" Margin="0,0,0,28"/>
+            </StackPanel>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsCollapsed}" Value="True">
+                    <Setter TargetName="Items" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="Chevron" Property="RenderTransform">
+                        <Setter.Value>
+                            <RotateTransform Angle="-90"/>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding HasHeading}" Value="False">
+                    <Setter TargetName="Heading" Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+    </Window.Resources>
+
+    <Grid x:Name="Root" Margin="12,4,12,16" SizeChanged="Root_SizeChanged">
+
+        <!-- The shadow sits on its own layer so the text above it stays sharp. -->
+        <Border Margin="0,18,0,0" CornerRadius="14" Background="{StaticResource BoardEdgeBrush}">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="16" ShadowDepth="5" Direction="270" Opacity="0.35"/>
+            </Border.Effect>
+        </Border>
+
+        <Border x:Name="Board" Margin="0,18,0,0" CornerRadius="14" Background="{StaticResource BoardBrush}"
+                BorderBrush="{StaticResource BoardEdgeBrush}" BorderThickness="1.5" Padding="11,11,11,12"
+                MouseLeftButtonDown="Board_MouseLeftButtonDown">
+            <Grid>
+                <!-- Edges of the pages under the top sheet. -->
+                <Border Background="#CDD1CB" CornerRadius="3"/>
+                <Border Background="#E1E4DF" CornerRadius="3" Margin="0,0,0,2"/>
+
+                <Border Background="{StaticResource PaperBrush}" CornerRadius="3" Margin="0,0,0,4" ClipToBounds="True">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Rectangle Grid.RowSpan="2" Width="1.5" HorizontalAlignment="Left" Margin="37,0,0,0"
+                                   Fill="{StaticResource MarginBrush}"/>
+
+                        <Grid Height="58">
+                            <Rectangle Height="1" VerticalAlignment="Bottom" Fill="{StaticResource RuleBrush}"/>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="46,0,0,0">
+                                <TextBlock x:Name="TitleText" Text="To do" FontSize="20" FontWeight="Bold" Margin="0,0,0,-5"/>
+                                <TextBlock x:Name="CountText" Foreground="{StaticResource PencilBrush}"
+                                           VerticalAlignment="Bottom" Margin="12,0,0,-3"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                        Margin="0,0,6,5">
+                                <Button x:Name="LayerButton" Style="{StaticResource PadButton}" Click="LayerButton_Click">
+                                    <Canvas Width="14" Height="14">
+                                        <Rectangle x:Name="BackSquare" Width="9" Height="9" RadiusX="1" RadiusY="1"
+                                                   Stroke="{StaticResource InkBrush}" StrokeThickness="1.5"/>
+                                        <Rectangle x:Name="FrontSquare" Canvas.Left="5" Canvas.Top="5" Width="9" Height="9"
+                                                   RadiusX="1" RadiusY="1"
+                                                   Stroke="{StaticResource InkBrush}" StrokeThickness="1.5"/>
+                                    </Canvas>
+                                </Button>
+                                <Button Style="{StaticResource PadButton}" Click="MinimizeButton_Click" ToolTip="Minimize">
+                                    <Path Width="14" Height="14" Data="M1.5,8 L12.5,8" StrokeThickness="1.8"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                </Button>
+                                <Button Style="{StaticResource CloseButton}" Click="CloseButton_Click" ToolTip="Close">
+                                    <Path Width="14" Height="14" Data="M2.5,2.5 L11.5,11.5 M11.5,2.5 L2.5,11.5"
+                                          StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <ScrollViewer x:Name="Scroller" Grid.Row="1" VerticalScrollBarVisibility="Auto" Focusable="False">
+                            <StackPanel Background="{StaticResource LinesBrush}"
+                                        MinHeight="{Binding ViewportHeight, ElementName=Scroller}">
+                                <ItemsControl x:Name="GroupList" ItemTemplate="{StaticResource GroupTemplate}" Focusable="False"/>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <TextBlock x:Name="Message" Grid.Row="1" Margin="46,4,16,0" Visibility="Collapsed"
+                                   TextWrapping="Wrap" LineHeight="28" LineStackingStrategy="BlockLineHeight"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <Rectangle x:Name="Rings" Height="48" VerticalAlignment="Top" HorizontalAlignment="Center"
+                   Fill="{StaticResource RingsBrush}" IsHitTestVisible="False"/>
+
+        <!-- Three ridges cut into the board: a dark groove with a light edge under it.
+             The lines stay inside the board's rounded corner and off the paper. -->
+        <Thumb x:Name="ResizeGrip" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+               Margin="0,0,2,2" Cursor="SizeNWSE" ToolTip="Drag to resize"
+               DragDelta="ResizeGrip_DragDelta" DragCompleted="ResizeGrip_DragCompleted">
+            <Thumb.Template>
+                <ControlTemplate TargetType="Thumb">
+                    <Grid Background="Transparent">
+                        <Path Data="M18,8 L8,18 M18,12 L12,18 M18,16 L16,18" Stroke="#4A2D16" StrokeThickness="1.3"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        <Path x:Name="Ridge" Data="M18,8 L8,18 M18,12 L12,18 M18,16 L16,18" Stroke="#D9B98F"
+                              StrokeThickness="1.1" StrokeStartLineCap="Round" StrokeEndLineCap="Round">
+                            <Path.RenderTransform>
+                                <TranslateTransform X="1" Y="1"/>
+                            </Path.RenderTransform>
+                        </Path>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Ridge" Property="Stroke" Value="#FFF1DC"/>
+                        </Trigger>
+                        <Trigger Property="IsDragging" Value="True">
+                            <Setter TargetName="Ridge" Property="Stroke" Value="#FFF1DC"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Thumb.Template>
+        </Thumb>
+    </Grid>
+</Window>
