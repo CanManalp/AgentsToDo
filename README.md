@@ -60,7 +60,8 @@ Put the same lines in the file they read their instructions from, for example `A
 - Double-click a line to select its text. All of it starts selected, so `Ctrl+C` copies the whole item, even the part cut off with "…". Press `Esc` or click elsewhere to finish.
 - Drag it anywhere. It opens where you left it.
 - Resize it with the ridges in the bottom-right corner. It keeps that size too.
-- Three buttons: keep it in front of other windows or behind them, minimize, and close.
+- Four buttons: show or hide done items, keep it in front of other windows or behind them, minimize, and close.
+  Done items are hidden at first. A group with only done items is hidden with them.
 - Click a group heading to fold it. Folded groups stay folded after a restart.
 
 ## File format
@@ -79,7 +80,7 @@ The default file is `%USERPROFILE%\todo.md`. On first start the app creates it w
 
 - `# ...` (optional) is the title of the note.
 - `## ...` starts a group.
-- `- [ ]` is an open item, `- [x]` a done one (shown crossed out).
+- `- [ ]` is an open item, `- [x]` a done one (crossed out when done items are shown).
 - A title that starts with `!` is written in red.
 - Text inside `<!-- -->` is hidden on the note and shown in the tooltip when you hover the item.
 - Every other line is ignored, so the file can hold other notes too.
@@ -88,7 +89,7 @@ Save the file as UTF-8.
 
 ## Settings
 
-`%LOCALAPPDATA%\AgentsToDo\settings.json` keeps the position, size, front/behind mode and folded groups.
+`%LOCALAPPDATA%\AgentsToDo\settings.json` keeps the position, size, front/behind mode, whether done items are shown, and folded groups.
 To use another file, close the note, add `TodoFile`, and start it again:
 
 ```json

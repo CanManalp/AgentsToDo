@@ -62,6 +62,7 @@ public partial class MainWindow : Window
         Loaded += (_, _) =>
         {
             ApplyLayerMode();
+            ApplyDoneMode();
             Reload(createIfMissing: true);
         };
         Deactivated += (_, _) =>
@@ -119,6 +120,14 @@ public partial class MainWindow : Window
 
         int total = document.Groups.Sum(group => group.Items.Count);
         int open = document.Groups.Sum(group => group.OpenCount);
+
+        // Hidden done items stay in the file; they are only left off the note.
+        if (!settings.ShowDone)
+        {
+            foreach (TodoGroup group in document.Groups)
+                group.Items.RemoveAll(item => item.IsDone);
+            document.Groups.RemoveAll(group => group.Items.Count == 0);
+        }
 
         TitleText.Text = document.Title;
         CountText.Text = total == 0 ? "" : open == 0 ? "all done" : $"{open} open";
@@ -234,6 +243,27 @@ public partial class MainWindow : Window
         if (group.IsCollapsed)
             settings.Collapsed.Add(group.Name);
         settings.Save();
+    }
+
+    void DoneButton_Click(object sender, RoutedEventArgs e)
+    {
+        settings.ShowDone = !settings.ShowDone;
+        settings.Save();
+        ApplyDoneMode();
+        Reload(createIfMissing: false);
+    }
+
+    void ApplyDoneMode()
+    {
+        var ink = (Brush)FindResource("InkBrush");
+        var paper = (Brush)FindResource("PaperBrush");
+
+        // A filled box means the done items are on the note.
+        DoneBox.Fill = settings.ShowDone ? ink : paper;
+        DoneTick.Stroke = settings.ShowDone ? paper : ink;
+        DoneButton.ToolTip = settings.ShowDone
+            ? "Done items are shown. Click to hide them."
+            : "Done items are hidden. Click to show them.";
     }
 
     void LayerButton_Click(object sender, RoutedEventArgs e)

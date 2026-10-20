@@ -127,6 +127,15 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                         Margin="0,0,6,5">
+                                <Button x:Name="DoneButton" Style="{StaticResource PadButton}" Click="DoneButton_Click">
+                                    <Canvas Width="14" Height="14">
+                                        <Rectangle x:Name="DoneBox" Canvas.Left="1.5" Canvas.Top="1.5" Width="11" Height="11"
+                                                   RadiusX="1.5" RadiusY="1.5"
+                                                   Stroke="{StaticResource InkBrush}" StrokeThickness="1.5"/>
+                                        <Path x:Name="DoneTick" Data="M4.3,7.3 L6.3,9.3 L9.8,4.8" StrokeThickness="1.6"
+                                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
+                                    </Canvas>
+                                </Button>
                                 <Button x:Name="LayerButton" Style="{StaticResource PadButton}" Click="LayerButton_Click">
                                     <Canvas Width="14" Height="14">
                                         <Rectangle x:Name="BackSquare" Width="9" Height="9" RadiusX="1" RadiusY="1"

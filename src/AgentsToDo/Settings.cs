@@ -16,6 +16,7 @@ public sealed class Settings
     public double Width { get; set; } = 340;
     public double Height { get; set; } = 480;
     public bool InFront { get; set; } = true;
+    public bool ShowDone { get; set; }
     public List<string> Collapsed { get; set; } = [];
 
     /// <summary>Path of the todo file. Empty means %USERPROFILE%\todo.md.</summary>
